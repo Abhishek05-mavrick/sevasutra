@@ -1,0 +1,28 @@
+{
+  "name": "engine-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/app.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node dist/server.js",
+    "demo": "node dist/demo.js",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fastify": "^5.0.0",
+    "platform-core": "workspace:*",
+    "rules-engine": "workspace:*",
+    "rules-fixtures": "workspace:*",
+    "rules-schema": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  }
+}

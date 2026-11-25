@@ -1,0 +1,17 @@
+{
+  "name": "sahayak",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sahayak — Deterministic Eligibility Engine for Indian Government Schemes",
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:rules": "pnpm --filter rules-fixtures test",
+    "lint": "pnpm -r lint",
+    "demo": "pnpm --filter engine-api demo"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

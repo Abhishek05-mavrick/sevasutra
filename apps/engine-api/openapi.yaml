@@ -1,0 +1,173 @@
+openapi: 3.1.0
+info:
+  title: Sahayak Eligibility & Platform API
+  version: 0.1.0
+  description: >
+    API contract for Sahayak (PS 26). The deterministic rules-engine is the single
+    authority for eligibility decisions. Informational only; not an official decision.
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      summary: Service health check
+      responses:
+        "200":
+          description: OK
+  /schemes:
+    get:
+      summary: List curated scheme rules and verification status
+      responses:
+        "200":
+          description: Array of scheme summaries
+  /evaluate:
+    post:
+      summary: Deterministically evaluate a single scheme for a citizen profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scheme_id, profile_snapshot, as_of]
+              properties:
+                scheme_id: { type: string }
+                rule_version: { type: string }
+                profile_snapshot: { type: array, items: { type: object } }
+                as_of: { type: string, format: date }
+      responses:
+        "200":
+          description: Deterministic EvaluationResult
+        "400":
+          description: Validation error
+        "404":
+          description: Scheme not found
+  /evaluate/batch:
+    post:
+      summary: Evaluate one profile against multiple schemes (deterministic order)
+      responses:
+        "200":
+          description: Batch evaluation results
+  /evaluations/{id}:
+    get:
+      summary: Fetch stored evaluation metadata and result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Stored evaluation
+  /evaluations/{id}/replay:
+    post:
+      summary: Replay stored evaluation inputs and verify byte-identical result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Replay verification result
+  /rules/validate:
+    post:
+      summary: Validate a scheme rule against JSON/Zod schema and catalogue lint checks
+      responses:
+        "200":
+          description: Validation and lint report
+  /rules/diff:
+    post:
+      summary: Diff two immutable rule versions
+      responses:
+        "200":
+          description: Node-level diff
+  /rules/impact:
+    post:
+      summary: Analyze which stored profiles change state under a new rule version
+      responses:
+        "200":
+          description: Profile impact summary
+  /auth/otp/request:
+    post:
+      summary: Request an Indian mobile OTP challenge
+      responses:
+        "200":
+          description: Challenge created (OTP never returned or logged)
+  /auth/otp/verify:
+    post:
+      summary: Verify phone OTP and create Verified Applicant session
+      responses:
+        "200":
+          description: Session token and user role
+  /auth/google/explorer:
+    post:
+      summary: Google OIDC sign-in (Explorer role only)
+      responses:
+        "200":
+          description: Explorer session token
+  /consent/grant:
+    post:
+      summary: Grant explicit purpose-scoped consent
+      responses:
+        "200":
+          description: Consent record created
+  /consent/withdraw:
+    post:
+      summary: Withdraw purpose-scoped consent
+      responses:
+        "200":
+          description: Withdrawal status
+  /profile/next-questions:
+    post:
+      summary: Progressive profile — compute minimum next questions needed
+      responses:
+        "200":
+          description: Ordered list of missing discovery or scheme-specific questions
+  /profile/facts:
+    put:
+      summary: Save confirmed profile facts (requires verified_applicant + consent)
+      responses:
+        "200":
+          description: Saved masked facts summary
+  /applications/checklist:
+    post:
+      summary: Save document checklist state for a scheme
+      responses:
+        "200":
+          description: Application record
+  /applications/{id}/redirect:
+    post:
+      summary: Record official portal redirect in new tab
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Updated application status
+  /chat:
+    post:
+      summary: Grounded RAG chatbot over approved sources + deterministic engine
+      responses:
+        "200":
+          description: Cited answer or refusal with disclaimer
+  /reminders/preferences:
+    put:
+      summary: Update email/SMS/WhatsApp reminder preferences and IST quiet hours
+      responses:
+        "200":
+          description: Updated preferences
+  /feedback:
+    post:
+      summary: Report outdated info, broken links, or rule discrepancies
+      responses:
+        "200":
+          description: Feedback recorded
+  /audit:
+    get:
+      summary: List redacted audit events (staff + MFA required)
+      responses:
+        "200":
+          description: Audit log
